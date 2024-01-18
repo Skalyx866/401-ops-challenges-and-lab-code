@@ -15,16 +15,6 @@ def key_write():
 def key_load():
     return open("key.key", "rb").read()
 
-existing_key = os.path.isfile("key.key")
-if existing_key == False:
-    # generating key
-    key_write()
-    key = key_load()
-
-    # load the key
-else:
-    key = key_load()
-
 # encrypt file function
 
 def encrypt_file(filename, key):
@@ -35,43 +25,45 @@ def encrypt_file(filename, key):
     with open (filename, "rb") as file:
         file_data = file.read()
     # take file_data and writes a new file with file_data as contents
-    encrypted_data = f.encrypt(file_data)
-    os.remove(filename)
-    e = open(filename, "w")
-    e.write(str(encrypted_data))
-    e.close
-
+    ciphertext = f.encrypt(file_data)
+    with open (filename, "wb") as encrypted_data:
+        encrypted_data.write(ciphertext)
 # function that decrypts the file
 def decrypt_file(encrypted_file, key):
     # intiializing fernet key
     f = Fernet(key)
     with open (encrypted_file, "rb") as file:
-        encrypted_file = file.read()
+        encrypted_data = file.read()
 
     # proceed to decrypt the data
-    file_data = f.decrypt(encrypted_file)
-    os.remove(encrypted_file)
-    d = open(str(encrypted_file), "w")
-    d.write(file_data)
-    d.close
+    file_data = f.decrypt(encrypted_data)
+    with open (encrypted_file, "wb") as decrypted_file:
+        decrypted_file.write(file_data)
+
 
 # function that encrypts the clear text
 def encrypt_message(message, key):
     # initialize fernet key
     f = Fernet(key)
-    encrypted_message = f.encrypt(message)
-    print(encrypted_message)
+    encrypted_message = f.encrypt(message.encode())
+    print(encrypted_message.decode())
 
 # function to decrypt to clear text
 
 def decrypt_message(encrypted_message, key):
     f = Fernet(key)
-    message = f.decrypt(encrypted_message)
-    print(message)
+    message = f.decrypt(encrypted_message.encode())
+    print(message.decode())
 
 # main code
 
 # ask user what they would like to do
+if not os.path.isfile("key.key"):
+    key_write()
+    key = key_load()
+else:
+    key = key_load()
+
 decision = input("Pick what you want to do\n 1. encrypt a file\n 2. decrypt a file\n 3. encrypt a message\n 4. decrypt a message\n")
 
 if decision == "1":
@@ -84,7 +76,7 @@ if decision == "3":
     message = input("Please enter a message you would like to encrypt\n")
     encrypt_message(message, key)
 if decision == "4":
-    encrypted_message = input("Pleasse enter an encrypted messagee you would like to decrypt")
+    encrypted_message = input("Please enter an encrypted message you would like to decrypt\n")
     decrypt_message(encrypted_message, key)
 else:
     print("Invalid option")
