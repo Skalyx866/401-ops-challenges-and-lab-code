@@ -62,10 +62,10 @@ def ping_sweep():
     
 # port scan function
 def port_scan(host):
-    port_range_in = input(f"Please enter a port range e.g 10-90")
+    port_range_in = input(f"Please enter a port range e.g 10-90\n")
     first_port, last_port = map(int, port_range_in.split("-"))
     port_range_out = range(first_port, last_port, +1)
-    print(f"Scanning for open ports")
+    print(f"Scanning for open ports\n")
     for port in port_range_out:
         port_scanner(host, port)
 
